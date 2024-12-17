@@ -20,5 +20,4 @@ def test_sbis_page(browser):
 
     images = tensor_about_page.get_block_images(block)
     assert images, "No images found in the block"
-    first_image_size = images[0].size
-    assert all(img.size == first_image_size for img in images), "Images are not equal in size"
+    assert all(img.size == images[0].size for img in images), "Images are not equal in size"

@@ -7,6 +7,10 @@ class SbisPageLocators(object):
 
 class SbisContactsPageLocators(object):
     BANNER = (By.XPATH, "//div[@id='contacts_clients']//a[@href='https://tensor.ru/']")
+    REGION = (By.CLASS_NAME, "sbis_ru-Region-Chooser__text")
+    REGION_41 = (By.XPATH, "//span[@title='Камчатский край']")
+    PARTNER = (By.CSS_SELECTOR, "div.sbisru-Contacts-List__name")
+
 
 
 class TensorPageLocators(object):

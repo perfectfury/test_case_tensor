@@ -18,13 +18,13 @@ class BasePage:
     def find_element(self, locator, time=10):
         logger.info(f"Finding element by locator: {locator}")
         return WebDriverWait(self.driver, time).until(
-            EC.presence_of_element_located(locator),
+            EC.visibility_of_element_located(locator),
             message=f"Can't find element by locator {locator}")
 
     def find_elements(self, locator, time=10):
         logger.info(f"Finding elements by locator: {locator}")
         return WebDriverWait(self.driver, time).until(
-            EC.presence_of_all_elements_located(locator),
+            EC.visibility_of_all_elements_located(locator),
             message=f"Can't find elements by locator {locator}")
 
     def go_to_site(self):
@@ -36,6 +36,14 @@ class BasePage:
             self.driver.switch_to.window(self.driver.window_handles[-1])
         except IndexError:
             raise Exception("No new tab found to switch to")
+
+    def get_page_title(self):
+        logger.info("Getting the page title")
+        return self.driver.title
+
+    def get_page_url(self):
+        logger.info("Getting the page URL")
+        return self.driver.current_url
 
 
 class SbisPage(BasePage):
@@ -52,19 +60,35 @@ class SbisContactsPage(BasePage):
         self.go_to_new_tab()
         return TensorPage(self.driver)
 
+    def get_region(self):
+        logger.info("Getting the region title")
+        return self.find_element(SbisContactsPageLocators.REGION).text
+
+    def click_region_chooser(self):
+        logger.info("Clicking on the region chooser")
+        self.find_element(SbisContactsPageLocators.REGION).click()
+
+    def choose_41_region(self):
+        logger.info("Choosing region 41")
+        self.find_element(SbisContactsPageLocators.REGION_41).click()
+
+    def get_region_partner_name(self):
+        logger.info("Getting the region partner")
+        return self.find_element(SbisContactsPageLocators.PARTNER).text
+
 
 class TensorPage(BasePage):
     def get_card(self):
         logger.info("Getting the card on the tensor.ru")
         return self.find_element(TensorPageLocators.CARD_CONTAINER)
 
-    def get_card_title(self, card):
+    def get_card_title(self, element):
         logger.info("Getting the card title")
-        return card.find_element(*TensorPageLocators.CARD_TITLE).text
+        return element.find_element(*TensorPageLocators.CARD_TITLE).text
 
-    def navigate_to_about(self, card):
+    def navigate_to_about(self, element):
         logger.info("Navigating to the tensor.ru/about")
-        about_link = card.find_element(*TensorPageLocators.CARD_ABOUT)
+        about_link = element.find_element(*TensorPageLocators.CARD_ABOUT)
         logger.info(f"About page URL: {about_link.get_attribute('href')}")
         about_link.click()
         return TensorAboutPage(self.driver)
@@ -75,11 +99,11 @@ class TensorAboutPage(BasePage):
         logger.info("Checking the block on the tensor.ru/about")
         return self.find_element(TensorAboutPageLocators.BLOCK_CONTAINER)
 
-    def get_block_title(self, block):
+    def get_block_title(self, element):
         logger.info("Getting the block title")
-        return block.find_element(*TensorAboutPageLocators.BLOCK_TITLE).text
+        return element.find_element(*TensorAboutPageLocators.BLOCK_TITLE).text
 
-    def get_block_images(self, block):
+    def get_block_images(self, element):
         logger.info("Checking image sizes in the block")
-        grid = block.find_element(*TensorAboutPageLocators.BLOCK_GRID)
+        grid = element.find_element(*TensorAboutPageLocators.BLOCK_GRID)
         return grid.find_elements(*TensorAboutPageLocators.BLOCK_IMAGES)
