@@ -1,5 +1,6 @@
 import logging
 
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -63,6 +64,14 @@ class SbisContactsPage(BasePage):
     def get_region(self):
         logger.info("Getting the region title")
         return self.find_element(SbisContactsPageLocators.REGION).text
+
+    def check_region(self, value):
+        logger.info("Comparing region title with expected")
+        try:
+            return WebDriverWait(self.driver, 3).until(
+                EC.text_to_be_present_in_element(SbisContactsPageLocators.REGION, value))
+        except TimeoutException:
+            return False
 
     def click_region_chooser(self):
         logger.info("Clicking on the region chooser")
