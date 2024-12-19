@@ -6,8 +6,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from locators import *
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+filehandler = logging.FileHandler('logfile.log')
+formatter = logging.Formatter("%(asctime)s : %(levelname)s : %(name)s : %(message)s")
+filehandler.setFormatter(formatter)
+logger.addHandler(filehandler)
+logger.setLevel(logging.INFO)
 
 
 class BasePage:
@@ -39,11 +43,11 @@ class BasePage:
             raise Exception("No new tab found to switch to")
 
     def get_page_title(self):
-        logger.info("Getting the page title")
+        logger.info(f"Getting the page title: {self.driver.title}")
         return self.driver.title
 
     def get_page_url(self):
-        logger.info("Getting the page URL")
+        logger.info(f"Getting the page URL: {self.driver.current_url}")
         return self.driver.current_url
 
 
@@ -63,10 +67,12 @@ class SbisContactsPage(BasePage):
 
     def get_region(self):
         logger.info("Getting the region title")
-        return self.find_element(SbisContactsPageLocators.REGION).text
+        region_title = self.find_element(SbisContactsPageLocators.REGION).text
+        logger.info(f"Got the region title: {region_title}")
+        return region_title
 
     def check_region(self, value):
-        logger.info("Comparing region title with expected")
+        logger.info(f"Comparing region title with expected: {value}")
         try:
             return WebDriverWait(self.driver, 3).until(
                 EC.text_to_be_present_in_element(SbisContactsPageLocators.REGION, value))
@@ -79,11 +85,17 @@ class SbisContactsPage(BasePage):
 
     def choose_41_region(self):
         logger.info("Choosing region 41")
-        self.find_element(SbisContactsPageLocators.REGION_41).click()
+        try:
+            return WebDriverWait(self.driver, 3).until(
+                EC.element_to_be_clickable(SbisContactsPageLocators.REGION_41)).click()
+        except TimeoutException:
+            return False
 
     def get_region_partner_name(self):
         logger.info("Getting the region partner")
-        return self.find_element(SbisContactsPageLocators.PARTNER).text
+        name = self.find_element(SbisContactsPageLocators.PARTNER).text
+        logger.info(f"Got the region partner: {name}")
+        return name
 
 
 class TensorPage(BasePage):
